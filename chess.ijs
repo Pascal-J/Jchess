@@ -33,4 +33,4 @@ Rdirs =: ([: ;@;"1@((<0)&,^:(1=#)L:1)  ((']';'<:'){~(,-.)@(islower@[)) ((<./&:>L
 RdirsM =: ( 1 0 1 0 <;.(1) _1 1 _1 1 * Rdirs)"1
 bounds =: 7&<.@(0&>.)
 maxidx =: bounds leaf@(|."1@[ (<"1@(,. >)&{: , <"1@(,.~ >)&{.)"1 + each) 
-Rcap =:
+Rmax =: ( idxs maxidx  [ RdirsM idxs ((Rcuts<;.1 each Rspace)~)"1 _ ])
