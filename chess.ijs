@@ -34,3 +34,10 @@ RdirsM =: ( 1 0 1 0 <;.(1) _1 1 _1 1 * Rdirs)"1
 bounds =: 7&<.@(0&>.)
 maxidx =: bounds leaf@(|."1@[ (<"1@(,. >)&{: , <"1@(,.~ >)&{.)"1 + each) 
 Rmax =: ( idxs maxidx  [ RdirsM idxs ((Rcuts<;.1 each Rspace)~)"1 _ ])
+
+Bspace =: ([ (] #~ e.&>) </.@:(|."1)@]) ,"0 [ (] #~ e.&>) </.@]
+NB. returns maxlengths \< \> /> /< where infinity means till edge of board.
+BdirsM =: (   [ > L:1@(<./@:,&:> L:1)@:( (({: ,~ >:leaf@{.)@] L:1)`(({. , >:leaf@{:)@] L:1)@.(islower@[)) ('|.leaf@]' ;'(}.leaf@])')  {.leaf@(_:^:(0=#)leaf)@(I.@islower;I.@isupper)@:apply each L:1 [(a:(_2{.,)]<;.1~1(0})-.@i.)leaf Bspace)"1 _
+backtrack =: 2 : '] ([`]@.v"_) u' 
+untilOB =: 2 : ' u backtrack(*./@:(_1&<)@] *. *./@:(8&>)@])(^:n)'
+Bmax =: (|:@:(<"1)@((_1 _1;1 1;_1 1;1 _1)(,."0 1)<"1@idxs) 4 :' a + untilOB y b  [ ''a b''=. x'  each"1 1 ;"1@BdirsM)
