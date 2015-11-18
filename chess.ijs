@@ -19,3 +19,18 @@ c4xf7 e8xf7
 e4-e5 d7-d5
 e5xd6
 )
+
+   islowerg =: e.&'bnprgskq'
+   isupperg =: e.&'BNPRGSKQ'
+   islower =: e.&'bnprskq'
+   isupper =: e.&'BNPRSKQ'
+NB. capture routines x is from square idx, y is board. returns list of indexes that can be captured
+Rcuts =: (1 (0}) each (8#0) <@:amV~("1)  1 ;"0 ])
+Rspace =: (|:@:[ {~ {:@]) ; [ {~ {.@]
+idxs =:(4$.$.)@:-.@i.
+NB. returns maxlengths < > ^ V where infinity means till edge of board.
+Rdirs =: ([: ;@;"1@((<0)&,^:(1=#)L:1)  ((']';'<:'){~(,-.)@(islower@[)) ((<./&:>L:1)@:(<./&:>leaf)@:(>:@(_:^:(0=#))@apply each))L:1(I.@islower;I.@isupper)@:((|.@]`(}.@]))@.([={.@]))leaf)
+RdirsM =: ( 1 0 1 0 <;.(1) _1 1 _1 1 * Rdirs)"1
+bounds =: 7&<.@(0&>.)
+maxidx =: bounds leaf@(|."1@[ (<"1@(,. >)&{: , <"1@(,.~ >)&{.)"1 + each) 
+Rcap =:
