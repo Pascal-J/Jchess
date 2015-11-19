@@ -89,3 +89,19 @@ to unbox without border ,./"3 >
     ├─┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
     │ │a    │b    │c    │d    │e    │f    │g    │h    │
     └─┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
+
+
+multi adverb tricks
+
+      CFilt =: 2 : '] (] #~"1 m e.~ {~) v'
+      9: 'P'CFilt Pmax 'N' CFilt Nmax 'BQ' CFilt Bmax 'RQ' CFilt Rmax ,&, conjpose
+     (] (] #~"1 'P' e.~ {~) Pmax) ,&, (] (] #~"1 'N' e.~ {~) Nmax) ,&, (] (] #~"1 'BQ' e.~ {~) Bmax) ,&, ] (] #~"1 'RQ' e.~ {~) Rmax
+     
+     shorter version, doesn't quite automated into a single adverb yet.  But eliminates repeated Cflit call
+      9: 'P' Pmax 'N' Nmax 'BQ' Bmax 'RQ' Rmax'CFilt' ,&, lrT innerpose1 unboxeval 
+      'k' 9: 'P' Pmax 'N' Nmax 'BQ' Bmax 'RQ' Rmax'CFilt' ,&, lrT innerpose1 unboxeval toascii'1r3kR1/4P3/6NB/8/8/Q7/8/4KR2'
+    ┌───┬───┬───┬───┬───┐
+    │1 4│2 6│2 7│0 6│7 5│
+    └───┴───┴───┴───┴───┘
+
+code is returning all the squares that hold pieces that put the black king in check.
