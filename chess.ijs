@@ -51,12 +51,22 @@ checksWhite =: ((] (] #~"1 'p' e.~ {~) Pmax) ,&, (] (] #~"1 'n' e.~ {~) Nmax) ,&
 
 Rmax2 =: 1 : '(m pieceandpositions ((1{::[)maxidx(0{::[)RdirsM(1{::[)((Rcuts<;.1 each Rspace)~)"1 _])"1 _ ])'
 Rmoves =: <@(3 : '(P;f) , < (<f) -.~ ~. ; <"1 each ((0 _1 ;l);(0 1 ;r);(_1 0 ;u);<(1 0 ; d))   (] , {:@] + 0 {:: [)^:({:@] -.@-:  1{::"1[)^:_ each   < ,: f [''P f l r u d'' =. y'"1)
+RmaxM =: 1 : 'm pieceandpositions ,"1 m Rmax2'
+amove =: (]amV reduce~ [|."1@:(;"0)'.'(,{.){)  NB. x is fromidx, toidx
+buildmoves =:  >@(,&.>/)@:((1&{ (,"0) 2&({::)) each)
+buildmoves2 =:  >@(,&.>/)@:((#~ 0 < # every)@:( (1&{ (,"0) 2&({::))&.>))
+Rcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:Rmoves@(x RmaxM)) y'
 
 BdirsM2 =: (0 {::"1 [) BdirsM ]
 Bmax3=:  (|:@:(<"1)@((_1 _1;1 1;_1 1;1 _1)(,."0 1)<"1@(1{:: [)) 4 :' a + untilOB y b  [ ''a b''=. x'  each"1 1 ;"1@{.@:(BdirsM2"1 _) )
 Bmax2=: 1 : 'm pieceandpositions Bmax3"1 _ ]'
-
-amove =: (]amV reduce~ [|."1@:(;"0)'.'(,{.){)  NB. x is fromidx, toidx
-buildmoves =: ,&>/@:((1&{ (,"0) 2&({::)) each)
 BmaxM =: 1 : 'm pieceandpositions ,"1 m Bmax2'
-Rcheck =: 4 : '  (] (] #~ (toupper`]@.(isupper x) 'k') #@(checksWhite`checksBlack@.(isupper x))"1 2  amove~"_ 1) buildmoves@:Rmoves@(x RmaxM)) y'
+
+cleanowncolour =: (<@[ ({.@] , (1 { ]) (,<) (2{::]) #~ [ -.@isupper@{~  2 {::])`({.@] , (1 { ]) (,<) (2{::]) #~ [ -.@isupper@{~  2 {::])@.(0 isupper@{:: ])each ])  NB. x is board y is BRNPK-moves
+Bcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:(cleanowncolour Bmoves@(x BmaxM))) y'
+
+cleanempty =: (<@[ ({.@] , (1 { ]) (,<) (2{::]) #~ [ -.@('.'&=)@{~  2 {::]) each ])
+   Pcapmoves =: >@( ]  ( (] #~"1 '.' 0:`~:@.(2 > #@$@]) {~)L:1)   <"1@Pmax)
+   Pfwd =: (] (] #~"1 '.' =  {~ ) <"1@idxs (#~ (*./@:(_1&<) *. *./@:(8&>))&>)"1@(+&.>"0 1) (_1 0;1 0) {~ islower@[)
+   Pmoves =: 1 : 'm( <"1@(m pieceandpositions@]) (, <) each   a: -.~ L:1 a: -.~ [: <"1 Pfwd ,"1 Pcapmoves)y'
+   Pcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves2@:(] cleanowncolour x Pmoves)) y'
