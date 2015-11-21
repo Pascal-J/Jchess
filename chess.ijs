@@ -40,6 +40,7 @@ NB. returns maxlengths \< \> /> /< where infinity means till edge of board.
 BdirsM =: (   [ > L:1@(<./@:,&:> L:1)@:( (({: ,~ >:leaf@{.)@] L:1)`(({. , >:leaf@{:)@] L:1)@.(islower@[)) ('|.leaf@]' ;'(}.leaf@])')  {.leaf@(_:^:(0=#)leaf)@(I.@islower;I.@isupper)@:apply each L:1 [(a:(_2{.,)]<;.1~1(0})-.@i.)leaf Bspace)"1 _
 backtrack =: 2 : '] ([`]@.v"_) u' 
 untilOB =: 2 : ' u backtrack(*./@:(_1&<)@] *. *./@:(8&>)@])(^:n)'
+untilOBorCap =: 2 : ' u backtrack(*./@:(_1&<)@] *. *./@:(8&>)@])(^:n)'
 Bmax =: (|:@:(<"1)@((_1 _1;1 1;_1 1;1 _1)(,."0 1)<"1@idxs) 4 :' a + untilOB y b  [ ''a b''=. x'  each"1 1 ;"1@BdirsM)
 
 NB. all valid Night jumps
@@ -49,6 +50,8 @@ Pmax =:  ( <"1@idxs (#~ (*./@:(_1&< ) *. *./@:(8&>))every)"1@(+ each"0 1) ( (_1 
 checksBlack =: ((] (] #~"1 'P' e.~ {~) Pmax) ,&, (] (] #~"1 'N' e.~ {~) Nmax) ,&, (] (] #~"1 'BQ' e.~ {~) Bmax) ,&, ] (] #~"1 'RQ' e.~ {~) Rmax)
 checksWhite =: ((] (] #~"1 'p' e.~ {~) Pmax) ,&, (] (] #~"1 'n' e.~ {~) Nmax) ,&, (] (] #~"1 'bq' e.~ {~) Bmax) ,&, ] (] #~"1 'rq' e.~ {~) Rmax)
 
+pieceandpositions =: 1 : '( ({~ ;"0 ]) (<"1)@(4 $. $.)@:(e.&m))'
+pieceandpositionsV =: (] ({~ ;"0 ])  (<"1)@(4 $. $.)@:(e.~))
 Rmax2 =: 1 : '(m pieceandpositions ((1{::[)maxidx(0{::[)RdirsM(1{::[)((Rcuts<;.1 each Rspace)~)"1 _])"1 _ ])'
 Rmoves =: <@(3 : '(P;f) , < (<f) -.~ ~. ; <"1 each ((0 _1 ;l);(0 1 ;r);(_1 0 ;u);<(1 0 ; d))   (] , {:@] + 0 {:: [)^:({:@] -.@-:  1{::"1[)^:_ each   < ,: f [''P f l r u d'' =. y'"1)
 RmaxM =: 1 : 'm pieceandpositions ,"1 m Rmax2'
@@ -58,15 +61,28 @@ buildmoves2 =:  >@(,&.>/)@:((#~ 0 < # every)@:( (1&{ (,"0) 2&({::))&.>))
 Rcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:Rmoves@(x RmaxM)) y'
 
 BdirsM2 =: (0 {::"1 [) BdirsM ]
+
+
 Bmax3=:  (|:@:(<"1)@((_1 _1;1 1;_1 1;1 _1)(,."0 1)<"1@(1{:: [)) 4 :' a + untilOB y b  [ ''a b''=. x'  each"1 1 ;"1@{.@:(BdirsM2"1 _) )
 Bmax2=: 1 : 'm pieceandpositions Bmax3"1 _ ]'
 BmaxM =: 1 : 'm pieceandpositions ,"1 m Bmax2'
+addBs =: 4 : ' a + untilOB y b  [ ''a b''=. x'
+Bmax8 =: 4 : '(  |:@:(<"1)@((_1 _1;1 1;_1 1;1 _1) ,."0 1 <"1@(1 {::"1 x pieceandpositions)) addBs each"1 1  (a:, a:) ;"1@-.~  x ,/@:>@:(({."1)@:(_2&(<\)))@:( BdirsM"0 _) ]) y'
+BmaxM =: 1 : '(m pieceandpositions ,"1 (m Bmax8 ]))'
+BdirsM4 =: (<"0@[ ([ >L:1@(<./@:,&:>L:1)@:(({: ,~ >:L:0@{.)@]L:1`(({. , >:L:0@{:)@]L:1)@.(islower@[)) (<;._1 ' |.leaf@] (}.leaf@])') {.L:0@(_:^:(0 = #)L:0)@(I.@islower ; I.@isupper)@:apply&.>L:1   [ (a: (_2 {. ,) ] <;.1~ (1) 0} -.@i.)L:0  Bspace)each ]) boxopen
 
 cleanowncolour =: (<@[ ({.@] , (1 { ]) (,<) (2{::]) #~ [ -.@isupper@{~  2 {::])`({.@] , (1 { ]) (,<) (2{::]) #~ [ -.@isupper@{~  2 {::])@.(0 isupper@{:: ])each ])  NB. x is board y is BRNPK-moves
-Bcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:(cleanowncolour Bmoves@(x BmaxM))) y'
-
+Bcheck2 =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:(cleanowncolour Bmoves@(x BmaxM))) y'
+Bcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:(cleanowncolour Bmoves@(BmaxF))) y'
+Boutcheck =: ((a:,a:) -.~ ,/)@:((('kK' {~ pD@*./@:isupper@[) (]#~0=#@((checksBlack("0 2)1&{::)`(checksWhite("0 2)1&{::"1)@.('K' = [))"1 1)](];"_1 amove~"_ 1)buildmoves@:Bmoves@BmaxF)"0 _)
 cleanempty =: (<@[ ({.@] , (1 { ]) (,<) (2{::]) #~ [ -.@('.'&=)@{~  2 {::]) each ])
    Pcapmoves =: >@( ]  ( (] #~"1 '.' 0:`~:@.(2 > #@$@]) {~)L:1)   <"1@Pmax)
    Pfwd =: (] (] #~"1 '.' =  {~ ) <"1@idxs (#~ (*./@:(_1&<) *. *./@:(8&>))&>)"1@(+&.>"0 1) (_1 0;1 0) {~ islower@[)
    Pmoves =: 1 : 'm( <"1@(m pieceandpositions@]) (, <) each   a: -.~ L:1 a: -.~ [: <"1 Pfwd ,"1 Pcapmoves)y'
    Pcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksWhite`checksBlack@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves2@:(] cleanowncolour x Pmoves)) y'
+
+BUG FIXES:  oblique on transpose won't line up items for untransposed... penalty for being too cute.
+
+BmaxF =:   4 :'pD isup =. {. *./@:isupper 0 ,@{::"1 a =.  (x pieceandpositions) y label_. (a ([, (_1 _1;1 1;_1 1;1 _1)+ backtrack((isup ~: y pD@isupper@{~ <@]) :: 0: *. *./@:(_1&<)@]*.*./@:(8&>)@]) each (_1 _1;1 1;_1 1;1 _1)+ backtrack((''.'' = y {~ <@]) :: 0: *. *./@:(_1&<)@]*.*./@:(8&>)@])^:_ each 1{[)"1 _]) y'
+
+Routcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksBlack`checksWhite@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:Rmoves@(x RmaxM)) y'
