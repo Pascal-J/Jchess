@@ -86,3 +86,18 @@ BUG FIXES:  oblique on transpose won't line up items for untransposed... penalty
 BmaxF =:   4 :'pD isup =. {. *./@:isupper 0 ,@{::"1 a =.  (x pieceandpositions) y label_. (a ([, (_1 _1;1 1;_1 1;1 _1)+ backtrack((isup ~: y pD@isupper@{~ <@]) :: 0: *. *./@:(_1&<)@]*.*./@:(8&>)@]) each (_1 _1;1 1;_1 1;1 _1)+ backtrack((''.'' = y {~ <@]) :: 0: *. *./@:(_1&<)@]*.*./@:(8&>)@])^:_ each 1{[)"1 _]) y'
 
 Routcheck =: 4 : '  (] (] #~ (toupper`]@.(*./@:isupper x) ''k'') #@(checksBlack`checksWhite@.(*./@:isupper x))"1 2  amove~"_ 1) buildmoves@:Rmoves@(x RmaxM)) y'
+
+Pmoves =: 4 : 'x( <"1@(x pieceandpositions@]) (, <) each   a: -.~ L:1 a: -.~ [: <"1 Pfwd ,"1 Pcapmoves)y'
+idxF =: 1 : '(i.@(0 0"_)`u@.(0 < #@idxs))'
+Rbuild =: (4 : ' buildmoves@:Rmoves@(x RmaxM) y' idxF)
+Bbuild =: ((buildmoves@:Bmoves@BmaxF)"1 _ idxF)
+Bnight =: (((a:, a:) -.~ ,"2/)@:((<"0@<"1@idxs ,"0  every ] ((1 {::"1 ]) <@#~"1  (0 {::"1 ]) ~: [ islower@{~ 1 {::"1 ]) islower@[ (;<)"1 Nmax)"1 _) idxF)
+NB. Bnight =: (Bnight f. idxF)
+Pbuild =: (buildmoves2@:(] cleanowncolour Pmoves) idxF)
+
+
+legalwhite =:  1 : '(''K''  (] #~ 0 = #@(checksWhite("0 2) 1&({::))"1 1)  ] (] ; amove~)"_ 1 u)'
+legalwhite =:  1 : '(''K''  ((0 {::"1]) #~ 0 = #@(checksWhite("0 2) 1&({::))"1 1)  ] (] ; amove~)"_ 1 u)'
+checkblackF =: 1 : '(''k'' ((0 {::"1]) #~ 0 < #@(checksBlack("0 2) 1&({::))"1 1)  ] (] ; amove~)"_ 1 u)'
+Wmove =: ('N'&Bnight , 'P'&Pbuild , 'BQ'&Bbuild , 'RQ'&Rbuild) legalwhite
+Bmove =: ('n'&Bnight , 'p'&Pbuild , 'bq'&Bbuild , 'rq'&Rbuild) legalblack
