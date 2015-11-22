@@ -92,12 +92,18 @@ idxF =: 1 : '(i.@(0 0"_)`u@.(0 < #@idxs))'
 Rbuild =: (4 : ' buildmoves@:Rmoves@(x RmaxM) y' idxF)
 Bbuild =: ((buildmoves@:Bmoves@BmaxF)"1 _ idxF)
 Bnight =: (((a:, a:) -.~ ,"2/)@:((<"0@<"1@idxs ,"0  every ] ((1 {::"1 ]) <@#~"1  (0 {::"1 ]) ~: [ islower@{~ 1 {::"1 ]) islower@[ (;<)"1 Nmax)"1 _) idxF)
-NB. Bnight =: (Bnight f. idxF)
+Bnight =:  i.@(0 0"_)`(((a:, a:) -.~ ,"2/)@:(<"0@<"1@idxs ,"0&> ] ((1{::"1]) <@#~("1) ( 0{::"1]) ~: [ -.@islower@{~ 1{::"1]) (islower@[(;<)"1 Nmax)"1 _))@.(0 < #@idxs)
 Pbuild =: (buildmoves2@:(] cleanowncolour Pmoves) idxF)
-
-
+Kmax =: (_1 1;_1 _1;1 1;1 _1;1 0;0 1 ;_1 0;0 _1) (#~ (*./@:(_1&<) *. *./@:(8&>))&>)"1@|:@:(+&.>"0 1) <"1@idxs
+Kbuild =:  (((a:, a:) -.~ ,"2/)@:(<"0@<"1@idxs ,"0&> ] ((1{::"1]) <@#~("1) ( 0{::"1]) ~: [ -.@islower@{~ 1{::"1]) (islower@[(;<)"1 Kmax)"1 _))
+Kbuild =: {.@:(<"0@<"1@idxs ,"0&> ] ((1{::"1]) <@#~("1) ( 0{::"1]) = [ -.@islower@{~ 1{::"1 ])  (islower@[ (;<)"1 Kmax)"1 _)
 legalwhite =:  1 : '(''K''  (] #~ 0 = #@(checksWhite("0 2) 1&({::))"1 1)  ] (] ; amove~)"_ 1 u)'
 legalwhite =:  1 : '(''K''  ((0 {::"1]) #~ 0 = #@(checksWhite("0 2) 1&({::))"1 1)  ] (] ; amove~)"_ 1 u)'
 checkblackF =: 1 : '(''k'' ((0 {::"1]) #~ 0 < #@(checksBlack("0 2) 1&({::))"1 1)  ] (] ; amove~)"_ 1 u)'
 Wmove =: ('N'&Bnight , 'P'&Pbuild , 'BQ'&Bbuild , 'RQ'&Rbuild) legalwhite
-Bmove =: ('n'&Bnight , 'p'&Pbuild , 'bq'&Bbuild , 'rq'&Rbuild) legalblack
+Bmove =: ('k'&Kbuild , 'n'&Bnight , 'p'&Pbuild , 'bq'&Bbuild , 'rq'&Rbuild) legalblack
+
+MoveTree =: ([:(a:-.~,)@:(((0&{((<'m')<@,~[)`(((1{::"1]);~"2 1[,0{::])each)@.(0<#@])(](]<@;amove~)"_ 1 Bmove)@(1&{::))"1)every)(a:-.~,)@:>@:((0&{((1{::"1]);~"2 1[,0{::])each((]<@;amove~)"_ 1 Wmove checkblackF)@:(1&{::))each))^:(('m')*./@:(-.@-:every)1{::each])
+MoveTreeR =: 1 : '((0&{::) ((1{:: each]) <"1@,"0~ [ {.@:, 0{::each])((](]<@;amove~)"_ 1 u))@:(1{::[))'
+MoveTreeR5 =: 1 : '(a: -.~  [: , (<"1)@(((0&{::) ((1{:: each])  ,~"0 [ , (L:1) 0{:: each]) ((] (((_1 _1 ; _1 _1) <@; [)`((] <@; amove~)"_ 1)@.(0 < #@])) u))@:(1{::[))  every))'
+MateSolver =: ((1 {::"1 >@]) amove reduce~ (|.@{.@(_2]\every(0{::each])#~('m')(-:every)1{::each])MoveTree^:_)) 
